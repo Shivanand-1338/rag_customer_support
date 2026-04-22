@@ -1,0 +1,299 @@
+📘 RAG-Based Customer Support Assistant using LangGraph & HITL
+🔷 1. Introduction
+1.1 What is RAG?
+
+Retrieval-Augmented Generation (RAG) is a hybrid AI approach that combines:
+
+Information Retrieval (search relevant documents)
+Text Generation (generate answers using LLM)
+
+Instead of relying only on pre-trained knowledge, RAG:
+
+Fetches real-time relevant context
+Generates accurate, grounded responses
+1.2 Why RAG is Needed
+
+Traditional LLMs:
+
+❌ Hallucinate (generate incorrect facts)
+❌ Lack domain-specific knowledge
+❌ Cannot access private documents
+
+RAG solves this by:
+
+✔ Using external knowledge sources (PDFs)
+✔ Improving accuracy & reliability
+✔ Supporting enterprise use cases
+1.3 Use Case Overview
+
+This system acts as a Customer Support Assistant that:
+
+Answers queries from a university policy PDF
+Provides context-aware responses
+Escalates to human agents when uncertain
+🔷 2. High-Level Design (HLD)
+2.1 System Overview
+🎯 Problem Definition
+
+Manual customer support:
+
+Time-consuming
+Inconsistent
+Not scalable
+🎯 Solution
+
+An AI-powered assistant that:
+
+Retrieves knowledge from documents
+Answers queries intelligently
+Escalates complex cases
+2.2 Architecture Overview
+User (Streamlit UI)
+        │
+        ▼
+   Query Input
+        │
+        ▼
+ LangGraph Workflow
+        │
+ ┌───────────────┐
+ │ Intent Router │
+ └──────┬────────┘
+        │
+   ┌────┴─────┐
+   ▼          ▼
+  RAG       HITL
+  Flow     Escalation
+   │            │
+   ▼            ▼
+Retriever     Human Agent
+   │            │
+   ▼            ▼
+LLM        Response Input
+   │            │
+   └──────┬─────┘
+          ▼
+      Final Output
+2.3 Component Description
+📄 Document Loader
+Loads PDF using PyPDFLoader
+Extracts structured text
+✂️ Chunking Strategy
+Chunk size: 800 tokens
+Overlap: 100 tokens
+Ensures:
+Context continuity
+Better retrieval
+🧠 Embedding Model
+Model: all-MiniLM-L6-v2
+Converts text → dense vectors
+🗂 Vector Store (ChromaDB)
+Stores embeddings + metadata
+Enables fast similarity search
+🔍 Retriever
+Uses cosine similarity
+Retrieves Top-K relevant chunks
+🤖 LLM (Groq API)
+Model: LLaMA 3.1 / Mixtral
+Generates contextual answers
+🔄 Workflow Engine (LangGraph)
+Controls execution flow
+Maintains system state
+🚦 Routing Layer
+Decides:
+Answer OR escalate
+👤 HITL Module
+Human fallback for:
+Low confidence
+Complex queries
+2.4 Data Flow
+📥 Ingestion Flow
+PDF → Loader → Chunk → Embedding → ChromaDB
+📤 Query Flow
+User Query
+→ Embed Query
+→ Retrieve Chunks
+→ LLM Generate Answer
+→ Confidence Check
+→ (Optional) HITL
+→ Response
+2.5 Technology Choices
+Component	Technology	Justification
+Vector DB	ChromaDB	Lightweight, easy setup
+Workflow	LangGraph	Stateful control flow
+LLM	Groq (LLaMA)	Low latency
+UI	Streamlit	Fast prototyping
+Embedding	Sentence Transformers	Efficient
+2.6 Scalability Considerations
+📈 Large Documents
+Chunk indexing
+Incremental updates
+⚡ High Query Load
+Caching frequent queries
+Async processing
+⏱ Latency Optimization
+Reduce chunk size
+Optimize Top-K
+🔷 3. Low-Level Design (LLD)
+3.1 Module-Level Design
+Module	Responsibility
+Document Processing	Load PDF
+Chunking	Split text
+Embedding	Convert text → vectors
+Vector Storage	Store embeddings
+Retrieval	Fetch relevant chunks
+Query Processing	Generate answer
+Graph Engine	Control flow
+HITL	Human escalation
+3.2 Data Structures
+📄 Document
+{
+  "doc_id": "1",
+  "text": "full content"
+}
+✂️ Chunk
+{
+  "chunk_id": "c1",
+  "text": "...",
+  "metadata": { "page": 3 }
+}
+🧠 Embedding
+{
+  "vector": [0.12, 0.45, ...]
+}
+🔁 Query Response
+{
+  "query": "...",
+  "context": ["chunk1"],
+  "answer": "...",
+  "confidence": 0.9
+}
+🔄 Graph State
+{
+  "query": "",
+  "docs": [],
+  "answer": "",
+  "confidence": 0.0,
+  "escalate": false
+}
+3.3 Workflow Design (LangGraph)
+Nodes:
+Processing Node
+Output Node
+Flow:
+Input → Process → Output
+State Transition:
+Query added
+Context retrieved
+Answer generated
+3.4 Conditional Routing Logic
+Condition	Action
+High confidence	Answer
+Low confidence	Escalate
+No docs	Escalate
+Complex query	Escalate
+3.5 HITL Design
+Trigger:
+Confidence < 0.6
+Missing context
+Flow:
+AI → Fail → Human → Response → User
+Integration:
+
+Human answer overrides AI response
+
+3.6 API Design
+Input
+{
+  "query": "refund policy"
+}
+Output
+{
+  "answer": "...",
+  "confidence": 0.85,
+  "source": "AI/Human"
+}
+3.7 Error Handling
+Error	Handling
+No results	Escalate
+API failure	Retry
+Empty input	Validate
+🔷 4. Technical Documentation
+4.1 Design Decisions
+✂️ Chunk Size
+Trade-off:
+Small → faster
+Large → better context
+🧠 Embedding Strategy
+Semantic similarity
+Dense vector search
+🔍 Retrieval
+Top-K similarity search
+🧾 Prompt Design
+Restrict hallucination
+Force context usage
+4.2 Workflow Explanation
+
+LangGraph:
+
+Maintains system state
+Enables conditional routing
+Node Responsibilities
+Processing → retrieval + generation
+Output → final response
+4.3 Conditional Logic
+Intent Detection
+Based on:
+Query complexity
+Context availability
+Routing Decision
+Answer OR escalate
+4.4 HITL Implementation
+Role:
+Handle edge cases
+Benefits:
+
+✔ Improved accuracy
+✔ Reliability
+
+Limitations:
+
+❌ Slower
+❌ Requires human
+
+4.5 Challenges & Trade-offs
+Challenge	Trade-off
+Accuracy vs Speed	More context = slower
+Chunk size	Context vs performance
+Cost	Better model = expensive
+4.6 Testing Strategy
+Test Cases:
+Policy queries
+Unknown queries
+Edge cases
+Metrics:
+Accuracy
+Latency
+Escalation rate
+4.7 Future Enhancements
+
+🚀 Multi-document support
+🚀 Chat memory
+🚀 Feedback learning loop
+🚀 Web deployment (AWS)
+🚀 Fine-tuned embeddings
+
+🔷 Conclusion
+
+This project demonstrates:
+
+RAG system design
+Workflow orchestration using LangGraph
+Real-world customer support automation
+Human-AI collaboration (HITL)
+
+It is not just a chatbot, but a scalable AI decision system capable of:
+
+Intelligent retrieval
+Context-aware reasoning
+Controlled execution

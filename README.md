@@ -5,32 +5,32 @@ Built with **LangGraph**, **ChromaDB**, and **Groq LLM**, this system delivers a
 
 ---
 
-## 🚀 Features
+##  Features
 
-* 📄 **PDF Knowledge Base Processing**
-* ✂️ **Chunking & Embedding (Sentence Transformers)**
-* 🧠 **Semantic Search using ChromaDB**
-* 🤖 **LLM Response Generation (Groq API)**
-* 🔄 **Graph-based Workflow (LangGraph)**
-* 🚦 **Conditional Routing (Answer vs Escalate)**
-* 👤 **Human-in-the-Loop (HITL) Support**
-* 💬 **Streamlit Chat UI**
-* 📊 **Confidence Scoring**
+*  **PDF Knowledge Base Processing**
+*  **Chunking & Embedding (Sentence Transformers)**
+*  **Semantic Search using ChromaDB**
+*  **LLM Response Generation (Groq API)**
+*  **Graph-based Workflow (LangGraph)**
+*  **Conditional Routing (Answer vs Escalate)**
+*  **Human-in-the-Loop (HITL) Support**
+*  **Streamlit Chat UI**
+*  **Confidence Scoring**
 
 ---
 
-## 🧠 What is RAG?
+##  What is RAG?
 
 **Retrieval-Augmented Generation (RAG)** combines:
 
-* 🔍 Retrieval → Fetch relevant context from documents
-* 🤖 Generation → Use LLM to generate grounded answers
+*  Retrieval → Fetch relevant context from documents
+*  Generation → Use LLM to generate grounded answers
 
-👉 This reduces hallucination and improves accuracy.
+ This reduces hallucination and improves accuracy.
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```text
 User (Streamlit UI)
@@ -61,9 +61,47 @@ LLM        Response Input
       Final Output
 ```
 
+## 2. Data Ingestion Architecture
+PDF Document
+     │
+     ▼
+Document Loader (PyPDF)
+     │
+     ▼
+Text Chunking (800 tokens + overlap)
+     │
+     ▼
+Embedding Model (Sentence Transformers)
+     │
+     ▼
+Vector Storage (ChromaDB)
+
+
+## 3. Query Processing Flow
+User Query
+   │
+   ▼
+Convert to Embedding
+   │
+   ▼
+Retrieve Top-K Similar Chunks (ChromaDB)
+   │
+   ▼
+Pass Context + Query to LLM (Groq)
+   │
+   ▼
+Generate Answer
+   │
+   ▼
+Confidence Check
+   │
+   ├── High Confidence → Return Answer
+   │
+   └── Low Confidence → HITL Escalation
+
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```bash
 rag_customer_support/
@@ -102,7 +140,7 @@ rag_customer_support/
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### 1️⃣ Clone the repository
 
@@ -126,7 +164,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 Create a `.env` file in root:
 
@@ -155,15 +193,15 @@ streamlit run streamlit_app.py
 
 ---
 
-## 💡 How It Works
+##  How It Works
 
-### 📥 Ingestion Pipeline
+###  Ingestion Pipeline
 
 ```text
 PDF → Load → Chunk → Embed → Store (ChromaDB)
 ```
 
-### 📤 Query Flow
+###  Query Flow
 
 ```text
 User Query
@@ -176,7 +214,7 @@ User Query
 
 ---
 
-## 🔄 LangGraph Workflow
+##  LangGraph Workflow
 
 * **Node 1:** Processing (Retrieval + LLM)
 * **Node 2:** Output
@@ -184,7 +222,7 @@ User Query
 
 ---
 
-## 👤 Human-in-the-Loop (HITL)
+##  Human-in-the-Loop (HITL)
 
 Triggered when:
 
@@ -196,7 +234,7 @@ Triggered when:
 
 ---
 
-## 📊 Example Output
+##  Example Output
 
 ```text
 Q: What are the rules for refund of fees?
@@ -212,7 +250,7 @@ Confidence: 0.91
 
 ---
 
-## ⚠️ Challenges & Trade-offs
+##  Challenges & Trade-offs
 
 | Challenge         | Solution                |
 | ----------------- | ----------------------- |
@@ -223,12 +261,12 @@ Confidence: 0.91
 
 ---
 
-## 🚀 Future Enhancements
+##  Future Enhancements
 
-* 🔄 Multi-document support
-* 🧠 Conversational memory
-* 🌐 Deployment (AWS / Docker)
-* 📊 Feedback learning loop
+*  Multi-document support
+*  Conversational memory
+*  Deployment (AWS / Docker)
+*  Feedback learning loop
 * 📌 Source citation highlighting
 
 ---

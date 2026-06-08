@@ -3,6 +3,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from config import PERSIST_DIR, EMBEDDING_MODEL
 
 
+
 def create_vector_store(chunks):
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
@@ -16,9 +17,16 @@ def create_vector_store(chunks):
 
 
 def load_vector_store():
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+    embeddings = get_embeddings()
 
     return Chroma(
         persist_directory=PERSIST_DIR,
         embedding_function=embeddings
+    )
+from langchain_huggingface import HuggingFaceEmbeddings
+
+def get_embeddings():
+    return HuggingFaceEmbeddings(
+        model_name=EMBEDDING_MODEL,
+        model_kwargs={"device": "cpu"}
     )

@@ -6,3 +6,6 @@ chromadb
 sentence-transformers
 pypdf
 tqdm
+langchain-huggingface
+streamlit
+sentence-transformers

@@ -21,7 +21,6 @@ st.markdown("Ask questions from your PDF knowledge base")
 # -----------------------------
 # Load DB (cached)
 # -----------------------------
-@st.cache_resource
 def load_system():
     db = load_vector_store()
     retriever = get_retriever(db)
